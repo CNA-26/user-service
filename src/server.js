@@ -8,7 +8,7 @@ console.log(`Node.js ${process.version}`)
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.json({ msg: "Rahti node 0.3.1" })
+    res.json({ msg: "Rahti node 0.3.2" })
 })
 
 
