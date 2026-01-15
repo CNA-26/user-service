@@ -8,7 +8,7 @@ console.log(`Node.js ${process.version}`)
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.json({ msg: "Rahti2 node 0.3" })
+    res.json({ msg: "Rahti node 0.3.1" })
 })
 
 
@@ -18,5 +18,5 @@ app.listen(PORT, () => {
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
-    
+
 })
