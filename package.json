@@ -1,0 +1,24 @@
+{
+  "name": "rahti2-docker-node",
+  "version": "1.0.0",
+  "description": "Note: OpenShift wants the main branch to be named *master* by default, you have two options:\r 1. Push to origin/master to deploy\r 2. Change the setting in Openshift to *main*:    \r     Edit BuildConfig ==> Show advanced git options ==> Git reference: `main`",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "dev": "nodemon -L src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fw-teaching/rahti2-docker-node.git"
+  },
+  "author": "fw-teaching, CNA-26-user-service team",
+  "dependencies": {
+    "@prisma/client": "^6.19.2",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^6.19.2"
+  }
+}
