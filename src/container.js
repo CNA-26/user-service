@@ -1,15 +1,15 @@
 const createContainer = () => {
     const services = {};
 
-    // Token service: real vs mock
+    // Access token service: real vs mock
     if (process.env.USE_MOCK_TOKEN === 'true') {
         services.accessTokenService = require('./services/accessTokenService.mock')();
     } else {
         services.accessTokenService = require('./services/accessTokenService.jwt')();
     }
 
-    // Notes backend: mock vs http
-    const choice = (process.env.NOTES_BACKEND || 'mock').toLowerCase();
+    // User service: mock vs http
+    const choice = (process.env.NOTES_BACKEND || 'db').toLowerCase();
     if (choice === 'db') {
         services.userService = require('./services/userService.db');
     } else {
