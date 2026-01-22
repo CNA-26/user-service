@@ -9,7 +9,7 @@ const router = express.Router();
  * @openapi
  * /api/auth/users:
  *   post:
- *     summary: "Create a new user"
+ *     summary: Create a new user
  *     tags:
  *       - Users
  *     requestBody:
@@ -28,6 +28,47 @@ const router = express.Router();
  *               password:
  *                 type: string
  *                 format: password
+ *     responses:
+ *       201:
+ *         description: User successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Email already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 code:
+ *                   type: string
+ *       422:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 code:
+ *                   type: string
+ *       500:
+ *         description: Internal server error
  */
 router.post('/', async (req, res) => {
     const {email, password} = req.body || {};
@@ -38,7 +79,6 @@ router.post('/', async (req, res) => {
         });
     }
 
-    // Basic email regex (RFC 5322 simplified)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         return res.status(422).json({
@@ -47,16 +87,15 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const saltRounds = 10;
-        const passwordHash = await bcrypt.hash(password, saltRounds);
+        const passwordHash = await bcrypt.hash(password, 10);
 
         const user = await prisma.user.create({
             data: {
-                email, passwordHash
+                email, passwordHash,
             },
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             id: user.id, email: user.email, createdAt: user.createdAt,
         });
     } catch (err) {
@@ -67,7 +106,7 @@ router.post('/', async (req, res) => {
         }
 
         console.error('POST /users error:', err);
-        res.status(500).json({
+        return res.status(500).json({
             error: 'Internal server error', code: 'INTERNAL_ERROR',
         });
     }
