@@ -1,24 +1,41 @@
 {
-  "name": "rahti2-docker-node",
+  "name": "user-service",
   "version": "1.0.0",
-  "description": "Note: OpenShift wants the main branch to be named *master* by default, you have two options:\r 1. Push to origin/master to deploy\r 2. Change the setting in Openshift to *main*:    \r     Edit BuildConfig ==> Show advanced git options ==> Git reference: `main`",
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "nodemon -L src/server.js"
+    "start": "node src/index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fw-teaching/rahti2-docker-node.git"
+    "url": "git+https://github.com/CNA-26/user-servic.git"
   },
-  "author": "fw-teaching, CNA-26-user-service team",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CNA-26/user-servic/issues"
+  },
+  "homepage": "https://github.com/CNA-26/user-servic#readme",
+  "description": "",
   "dependencies": {
     "@prisma/client": "^6.19.2",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
-    "dotenv": "^17.2.3",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "prisma": "^6.19.2"
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "cross-env": "^10.0.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.19.2",
+    "supertest": "^7.1.4"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
