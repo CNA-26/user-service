@@ -1,5 +1,5 @@
 const express = require('express');
-const {PrismaClient} = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
@@ -70,8 +70,9 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
+
 router.post('/', async (req, res) => {
-    const {email, password} = req.body || {};
+    const { email, password } = req.body || {};
 
     if (!email || !password) {
         return res.status(422).json({
