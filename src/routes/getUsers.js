@@ -35,7 +35,37 @@ const router = express.Router();
  *                   format: email
  *                 userName:
  *                   type: string
+ * /api/auth/users:
+ *   get:
+ *     summary: Get all users info
+ *     tags: 
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Users data successfully fetched
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 oneOf:
+ *                   - type: object
+ *                     properties:
+ *                      id:
+ *                        type: string
+ *                        format: uuid
+ *                      email:
+ *                        type: string
+ *                        format: email
+ *                      userName:
+ *                        type: string
  */
+router.get('/', async (req, res) => {
+    return res.status(404).json({
+        error: "dead endpoint"
+    })
+});
+
 router.get('/:userId', async (req, res) => {
     return res.status(404).json({
         error: "dead endpoint"
