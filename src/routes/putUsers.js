@@ -1,6 +1,5 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+const {PrismaClient} = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -10,7 +9,7 @@ const router = express.Router();
  * /api/auth/users:
  *   put:
  *     summary: Update user info
- *     tags: 
+ *     tags:
  *       - Users
  *     requestBody:
  *       required: true
@@ -21,7 +20,6 @@ const router = express.Router();
  *             required:
  *               - userId
  *               - email
- *               - userName
  *             properties:
  *               userId:
  *                 type: string
@@ -29,31 +27,60 @@ const router = express.Router();
  *               email:
  *                 type: string
  *                 format: email
- *               userName:
- *                 type: string
- *                 example: NewUserName123
  *     responses:
  *       200:
  *         description: User data updated
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   format: uuid
- *                 email:
- *                   type: string
- *                   format: email
- *                 userName:
- *                   type: string
- *                   example: NewUserName123
+ *       400:
+ *         description: User not found
+ *       422:
+ *         description: Validation error
+ *       500:
+ *         description: Internal server error
  */
+
 router.put('/', async (req, res) => {
-    return res.status(404).json({
-        error: "dead endpoint"
-    })
+    const {userId, email} = req.body || {};
+
+    // validation
+    if (!userId || !email) {
+        return res.status(422).json({
+            error: 'userId and email are required', code: 'VALIDATION_ERROR',
+        });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(422).json({
+            error: 'Invalid email format', code: 'VALIDATION_ERROR',
+        });
+    }
+
+    try {
+        const user = await prisma.user.update({
+            where: {id: userId}, data: {email},
+        });
+
+        return res.json({
+            id: user.id, email: user.email, createdAt: user.createdAt,
+        });
+    } catch (err) {
+        if (err.code === 'P2025') {
+            return res.status(400).json({
+                error: 'User not found', code: 'USER_NOT_FOUND',
+            });
+        }
+
+        if (err.code === 'P2002' && err.meta?.target?.includes('email')) {
+            return res.status(400).json({
+                error: 'Email already exists', code: 'EMAIL_EXISTS',
+            });
+        }
+
+        console.error('PUT /users error:', err);
+        return res.status(500).json({
+            error: 'Internal server error', code: 'INTERNAL_ERROR',
+        });
+    }
 });
 
 module.exports = router;
