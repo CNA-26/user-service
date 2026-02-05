@@ -40,14 +40,73 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 msg:
+ *                 id:
  *                   type: string
- *                   example: User {userId} password changed successfully
+ *                   format: uuid
+ *                 message:
+ *                   type: string
+ *                   example: User password updated successfully
+ *       401:
+ *         description: User unauthorized
+ *       422:
+ *         description: Invalid request body
+ *       500:
+ *         description: Internal server error
  */
 router.patch('/updatePassword', async (req, res) => {
-    return res.status(404).json({
-        error: "dead endpoint"
-    })
+    const { userId, password, newPassword } = req.body || {};
+
+    if (!userId || !password || !newPassword) {
+        return res.status(422).json({
+            error: "userId, password and newPassword are required",
+            code: "VALIDATION_ERROR",
+        });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            },
+        });
+
+        bcrypt.compare(password, user.passwordHash, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    error: "Error comparing passwords",
+                    code: "INTERNAL_ERROR",
+                });
+            }
+
+            if (!result) {
+                return res.status(401).json({
+                    error: "Incorrect password",
+                    code: "WRONG_PASSWORD",
+                });
+            }
+        });
+
+        const passwordHash = bcrypt.hash(newPassword, 10);
+
+        const updateUser = await prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                passwordHash: passwordHash,
+            },
+        });
+
+        return res.status(200).json({
+            id: updateUser.id,
+            message: "User password updated successfully",
+        });
+    } catch (err) {
+        return res.status(500).json({
+            error: "Internal server errror",
+            code: "INTERNAL_ERROR",
+        });
+    }
 });
 
 module.exports = router;
