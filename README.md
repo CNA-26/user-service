@@ -1,6 +1,10 @@
-# rahti2 node.js
+# User Service
 
-### For deployment to Rahti2
+User interface for OpenAPI documentation: [unstable](https://user-service-devel-cna-26-user-service.2.rahtiapp.fi/api/auth/docs/), [production](https://user-service-cna-26-user-service.2.rahtiapp.fi/api/auth/docs/)
+
+## Instructions for Developers
+
+### For deployment to [CSC Rahti](https://docs.csc.fi/cloud/rahti/)
 
 Note: OpenShift wants the main branch to be named *master* by default, you have two options:
 1. Push to origin/master to deploy
