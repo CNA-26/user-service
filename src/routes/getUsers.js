@@ -61,9 +61,23 @@ const router = express.Router();
  *                        type: string
  */
 router.get('/', async (req, res) => {
-    return res.status(404).json({
-        error: "dead endpoint"
-    })
+    try {
+        const users = await prisma.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                userName: true,
+            },
+        });
+
+        return res.json(users);
+    } catch (err) {
+        console.error('GET /users error:', err);
+        return res.status(500).json({
+            error: 'Internal server error',
+            code: 'INTERNAL_ERROR',
+        });
+    }
 });
 
 router.get('/:userId', async (req, res) => {
