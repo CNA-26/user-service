@@ -16,7 +16,8 @@ const router = express.Router();
  *       - in: path
  *         name: userId
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *         required: true
  *         description: ID of user to get
  *     responses:
