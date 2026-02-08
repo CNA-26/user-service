@@ -10,7 +10,9 @@ module.exports = (container) => {
      * @openapi
      * /api/auth/refresh:
      *   post:
-     *     summary: Refresh access token using a refresh token
+     *     summary: Refresh access token
+     *     description: Returns a new access token using a valid refresh token
+     *     operationId: refreshAccessToken
      *     requestBody:
      *       required: true
      *       content:
@@ -22,6 +24,53 @@ module.exports = (container) => {
      *             properties:
      *               refreshToken:
      *                 type: string
+     *                 description: Refresh token issued during login
+     *     responses:
+     *       200:
+     *         description: Access token successfully refreshed
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 accessToken:
+     *                   type: string
+     *                 refreshToken:
+     *                   type: string
+     *       401:
+     *         description: Invalid or expired refresh token
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 code:
+     *                   type: string
+     *                   example: INVALID_REFRESH_TOKEN
+     *                 error:
+     *                   type: string
+     *       422:
+     *         description: Validation error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: refreshToken is required
+     *       500:
+     *         description: Internal server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 code:
+     *                   type: string
+     *                   example: INTERNAL_ERROR
+     *                 error:
+     *                   type: string
      */
     router.post('/', async (req, res) => {
         const {refreshToken} = req.body || {};
