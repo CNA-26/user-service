@@ -66,7 +66,7 @@ router.get('/', async (req, res) => {
             select: {
                 id: true,
                 email: true,
-                userName: true,
+                createdAt: true,
             },
         });
 
