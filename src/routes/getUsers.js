@@ -81,9 +81,42 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:userId', async (req, res) => {
-    return res.status(404).json({
-        error: "dead endpoint"
-    })
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(422).json({
+            error: 'userId is required',
+            code: 'VALIDATION_ERROR',
+        });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { 
+                id: userId 
+            },
+            select: {
+                id: true,
+                email: true,
+                createdAt: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(400).json({
+                error: 'User not found',
+                code: 'USER_NOT_FOUND',
+            });
+        }
+
+        return res.json(user);
+    } catch (err) {
+        console.error('GET /users/:userId error:', err);
+        return res.status(500).json({
+            error: 'Internal server error',
+            code: 'INTERNAL_ERROR',
+        });
+    }
 });
 
 module.exports = router;
