@@ -1,6 +1,7 @@
-const fs = require('fs');
 const jwt = require('jsonwebtoken');
-const {AccessTokenService, UnableToSignTokenError} = require('./accessTokenService');
+const {
+    AccessTokenService, UnableToSignTokenError, InvalidAccessTokenError,
+} = require('./accessTokenService');
 
 module.exports = () => {
     const secret = process.env.JWT_SECRET || 'super-secret-key';
@@ -17,6 +18,20 @@ module.exports = () => {
                 });
             } catch (err) {
                 throw new UnableToSignTokenError(err.message);
+            }
+        }
+
+        verify(token) {
+            try {
+                const payload = jwt.verify(token, secret, {
+                    issuer, audience,
+                });
+
+                return {
+                    sub: payload.sub, email: payload.email,
+                };
+            } catch (err) {
+                throw new InvalidAccessTokenError(err.message);
             }
         }
     }

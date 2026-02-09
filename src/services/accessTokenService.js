@@ -3,23 +3,23 @@
  *
  * Implementations must provide:
  *  - sign(sub: string, email: string) => string
- *
- * Notes:
- *  - `sub` is the subject (user id).
- *  - `email` is the user’s email.
- *  - `sign` returns a token string.
- *
- * Example implementations:
- *  - accessTokenService.jwt.js : uses RS256 JWT
- *  - jwtTokenService.mock.js: returns base64url encoded payload (for tests)
+ *  - verify(token: string) => { sub: string, email: string }
  */
 class AccessTokenService {
     /**
-     * @param {string} _sub - subject (user id)
-     * @param {string} _email - user email
-     * @returns {string} token string
+     * @param {string} _sub
+     * @param {string} _email
+     * @returns {string}
      */
     sign(_sub, _email) {
+        throw new Error('Not implemented');
+    }
+
+    /**
+     * @param {string} _token
+     * @returns {{ sub: string, email: string }}
+     */
+    verify(_token) {
         throw new Error('Not implemented');
     }
 }
@@ -35,7 +35,14 @@ class UnableToSignTokenError extends Error {
     }
 }
 
+class InvalidAccessTokenError extends Error {
+    constructor(message = 'Invalid access token') {
+        super(message);
+        this.name = 'InvalidAccessTokenError';
+        this.code = 'INVALID_ACCESS_TOKEN';
+    }
+}
+
 module.exports = {
-    AccessTokenService,
-    UnableToSignTokenError,
+    AccessTokenService, UnableToSignTokenError, InvalidAccessTokenError,
 };
