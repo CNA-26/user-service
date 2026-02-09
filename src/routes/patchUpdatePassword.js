@@ -9,7 +9,7 @@ const router = express.Router();
  * @openapi
  * /api/auth/users/updatePassword:
  *   patch:
- *     summary: Update user password
+ *     summary: Update user password, invalidates refresh token
  *     tags: 
  *       - Users
  *     requestBody:
@@ -95,6 +95,12 @@ router.patch('/updatePassword', async (req, res) => {
             data: {
                 passwordHash: passwordHash,
             },
+        });
+
+        await prisma.refreshToken.delete({
+            where: {
+                userId: userId,
+            }
         });
 
         return res.status(200).json({
