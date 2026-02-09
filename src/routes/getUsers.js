@@ -13,6 +13,8 @@ const router = express.Router();
  *     summary: Get user info by email
  *     tags: 
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: email
@@ -42,6 +44,8 @@ const router = express.Router();
  *     summary: Get all users info
  *     tags: 
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Users data successfully fetched
