@@ -1,6 +1,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
+const { Roles } = require('../constants/roles');
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -62,6 +63,15 @@ const router = express.Router();
  *                        type: string
  */
 router.get('/', async (req, res) => {
+    const auth = req.auth;
+
+    if (auth.role !== Roles.ADMIN) {
+        return res.status(401).json({
+            error: 'Forbidden: insufficient permissions',
+            code: 'FORBIDDEN',
+        });
+    }
+
     try {
         const users = await prisma.user.findMany({
             select: {

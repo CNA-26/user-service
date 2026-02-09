@@ -17,7 +17,7 @@ module.exports = (container) => {
     app.use('/api/auth/login', require('./routes/postLogin')(container));
 
     app.use('/api/auth/users', require('./routes/postUsers'));
-    app.use('/api/auth/users', require('./routes/getUsers'));
+    app.use('/api/auth/users', authMiddleware, require('./routes/getUsers'));
 
     app.use('/api/auth/users', authMiddleware, require('./routes/putUsers'));
 
