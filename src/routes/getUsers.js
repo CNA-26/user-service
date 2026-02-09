@@ -8,19 +8,19 @@ const router = express.Router();
 
 /**
  * @openapi
- * /api/auth/users/{userId}:
+ * /api/auth/users/{email}:
  *   get:
- *     summary: Get user info
+ *     summary: Get user info by email
  *     tags: 
  *       - Users
  *     parameters:
  *       - in: path
- *         name: userId
+ *         name: email
  *         schema:
  *           type: string
- *           format: uuid
+ *           format: email
  *         required: true
- *         description: ID of user to get
+ *         description: Email of user to get
  *     responses:
  *       200:
  *         description: User data successfully fetched
@@ -91,20 +91,28 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:userId', async (req, res) => {
-    const { userId } = req.params;
+router.get('/:email', async (req, res) => {
+    const { email } = req.params;
+    const auth = req.auth;
 
-    if (!userId) {
+    if (!email) {
         return res.status(422).json({
-            error: 'userId is required',
+            error: 'email is required',
             code: 'VALIDATION_ERROR',
+        });
+    }
+
+    if (auth.email !== email && auth.role !== Roles.ADMIN) {
+        return res.status(401).json({
+            error: 'Forbidden: insufficient permissions',
+            code: 'FORBIDDEN',
         });
     }
 
     try {
         const user = await prisma.user.findUnique({
             where: { 
-                id: userId 
+                email: email 
             },
             select: {
                 id: true,
@@ -122,7 +130,7 @@ router.get('/:userId', async (req, res) => {
 
         return res.json(user);
     } catch (err) {
-        console.error('GET /users/:userId error:', err);
+        console.error('GET /users/:email error:', err);
         return res.status(500).json({
             error: 'Internal server error',
             code: 'INTERNAL_ERROR',
