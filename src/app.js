@@ -21,7 +21,7 @@ module.exports = (container) => {
 
     app.put('/api/auth/users', authMiddleware, require('./routes/putUsers'));
 
-    app.use('/api/auth/users', require('./routes/deleteUsers'));
+    app.use('/api/auth/users', authMiddleware, require('./routes/deleteUsers'));
     app.use('/api/auth/users', require('./routes/postResetPassword'));
     app.use('/api/auth/users', require('./routes/patchUpdatePassword'));
 
