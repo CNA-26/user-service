@@ -11,6 +11,8 @@ const router = express.Router();
  *     summary: Update user info
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -30,6 +32,8 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: User data updated
+ *       401:
+ *         description: Unauthorized
  *       400:
  *         description: User not found
  *       422:
