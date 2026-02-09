@@ -1,7 +1,7 @@
 module.exports = (container) => {
     const accessTokenService = container.get('accessTokenService');
     const refreshTokenService = container.get('refreshTokenService');
-    const userService = container.get('userService');
+    const { Roles } = require('../constants/roles');
 
     return {
         /**
@@ -21,7 +21,7 @@ module.exports = (container) => {
                     role: true,
                 },
             });
-            const role = user.role || "USER";
+            const role = user.role || Roles.USER;
 
             const newAccessToken = accessTokenService.sign(userId, email, role);
 
