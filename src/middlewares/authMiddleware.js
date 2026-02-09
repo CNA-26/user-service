@@ -6,7 +6,7 @@ module.exports = (container) => {
 
         if (!header) {
             return res.status(403).json({
-                error: 'Authorization header is missing',
+                error: 'Authorization header is missing', code: 'AUTH_HEADER_MISSING',
             });
         }
 
@@ -14,7 +14,7 @@ module.exports = (container) => {
 
         if (type !== 'Bearer' || !token) {
             return res.status(401).json({
-                error: 'Invalid Authorization header format',
+                error: 'Invalid Authorization header format', code: 'INVALID_AUTH_HEADER',
             });
         }
 
@@ -24,7 +24,7 @@ module.exports = (container) => {
             next();
         } catch (err) {
             return res.status(401).json({
-                error: 'Invalid or expired access token',
+                error: 'Invalid or expired access token', code: 'INVALID_ACCESS_TOKEN',
             });
         }
     };
