@@ -1,6 +1,5 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-//const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -10,7 +9,7 @@ const router = express.Router();
  * /api/auth/users/{userId}:
  *   delete:
  *     summary: Remove user data
- *     tags: 
+ *     tags:
  *       - Users
  *     parameters:
  *       - in: path
@@ -31,6 +30,9 @@ const router = express.Router();
  *                 msg:
  *                   type: string
  *                   example: User {userId} deleted successfully
+ *                 id:
+ *                   type: string
+ *                   format: uuid
  *       400:
  *         description: userId is required
  *       401:
@@ -44,43 +46,35 @@ router.delete('/:userId', async (req, res) => {
     if (!userId) {
         return res.status(400).json({
             error: "userId is required",
-            code: "VALIDATION_ERROR",
+            code: "BAD_REQUEST",
         });
     }
 
-    // TODO: admin deletion
     try {
-        const authHeader = req.header('Authorization');
-        const tokenToBeDeleted = authHeader.split(' ')[1];
-        const refreshToken = await prisma.RefreshToken.findFirst({
-            where: {
-                token: tokenToBeDeleted,
-            },
-        });
+        if (req.auth.role === 'ADMIN' || req.auth.sub === userId) {
+            const userToBeDeleted = await prisma.User.delete({
+                where: {
+                    id: userId,
+                },
+            });
 
-        // guard statements to return
-        if (refreshToken === null) {
-            console.log('no token found to delete')
-            return res.status(401).send({msg: "User delete failed"})
+            return res.json({
+                status: 200,
+                msg: `User ${userToBeDeleted.id} deleted successfully`,
+                id: userId
+            });
         }
-
-        const deletedTokenAndUser = await prisma.RefreshToken.delete({
-            where: {
-                token: refreshToken
-            },
-        });
-
-        res.json({
-            status: 200,
-            msg: `Token deleted OK for userId ${refreshToken.userId}!`
+        return res.status(403).json({
+            msg: 'No permission to access resource',
+            code: 'FORBIDDEN'
         });
 
     } catch (error) {
-        console.log('DELETE /users/:userId error:', error);
+        console.log(`DELETE /users/${userId} error:`, error);
         // OBS: db felmeddelandena kan innehåll hemligheter!!! -> skapa ett eget felmeddelande
         return res.status(401).json({
-            msg: `Error: ${userId} delete failed`,
-            code: 'VALIDATION_ERROR'
+            msg: 'User unauthorized',
+            code: 'UNAUTHORIZED'
         });
     }
 });
