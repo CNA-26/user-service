@@ -11,6 +11,8 @@ const router = express.Router();
  *     summary: Remove user data
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
