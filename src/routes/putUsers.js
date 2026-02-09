@@ -1,49 +1,14 @@
-const express = require('express');
-const {PrismaClient} = require('@prisma/client');
-
-const prisma = new PrismaClient();
-const router = express.Router();
-
-/**
- * @openapi
- * /api/auth/users:
- *   put:
- *     summary: Update user info
- *     tags:
- *       - Users
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - email
- *             properties:
- *               userId:
- *                 type: string
- *                 format: uuid
- *               email:
- *                 type: string
- *                 format: email
- *     responses:
- *       200:
- *         description: User data updated
- *       401:
- *         description: Unauthorized
- *       400:
- *         description: User not found
- *       422:
- *         description: Validation error
- *       500:
- *         description: Internal server error
- */
+import Roles from "../constants/roles";
 
 router.put('/', async (req, res) => {
     const {userId, email} = req.body || {};
+    const auth = req.auth; // ← ИЗ middleware
+
+    if (auth.sub !== userId && auth.role !== Roles.ADMIN) {
+        return res.status(401).json({
+            error: 'Forbidden: insufficient permissions', code: 'FORBIDDEN',
+        });
+    }
 
     // validation
     if (!userId || !email) {
@@ -86,5 +51,3 @@ router.put('/', async (req, res) => {
         });
     }
 });
-
-module.exports = router;
