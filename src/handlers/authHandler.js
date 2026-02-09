@@ -10,9 +10,10 @@ module.exports = (container) => {
 
             // User userInfo as a sub
             const sub = userInfo.id;
-            const accessToken = accessTokenService.sign(sub, email);
+            const role = userInfo.role;
+            const accessToken = accessTokenService.sign(sub, email, role);
 
-            const {token: refreshToken} = await refreshTokenService.generate(sub);
+            const { token: refreshToken } = await refreshTokenService.generate(sub);
 
             return {
                 accessToken, refreshToken,

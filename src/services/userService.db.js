@@ -1,7 +1,7 @@
-const {PrismaClient} = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 
-const {UserService, UserNotFoundError, WrongPasswordError} = require('./userService');
+const { UserService, UserNotFoundError, WrongPasswordError } = require('./userService');
 
 const prisma = new PrismaClient();
 
@@ -14,7 +14,7 @@ class DbUserService extends UserService {
     async getMe(email, password) {
         // Find user
         const user = await prisma.user.findUnique({
-            where: {email},
+            where: { email },
         });
 
         if (!user) {
@@ -29,7 +29,7 @@ class DbUserService extends UserService {
 
         // Return normalized object
         return {
-            id: user.id, email: user.email, created_at: user.createdAt,
+            id: user.id, email: user.email, created_at: user.createdAt, role: user.role,
         };
     }
 }

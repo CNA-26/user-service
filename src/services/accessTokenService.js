@@ -11,7 +11,7 @@ class AccessTokenService {
      * @param {string} _email
      * @returns {string}
      */
-    sign(_sub, _email) {
+    sign(_sub, _email, _role) {
         throw new Error('Not implemented');
     }
 

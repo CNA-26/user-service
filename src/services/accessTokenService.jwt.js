@@ -11,9 +11,9 @@ module.exports = () => {
     const expiresIn = process.env.JWT_EXPIRES || '2m';
 
     class JwtAccessTokenService extends AccessTokenService {
-        sign(sub, email) {
+        sign(sub, email, role) {
             try {
-                return jwt.sign({sub, email}, secret, {
+                return jwt.sign({ sub, email, role }, secret, {
                     algorithm: 'HS256', issuer, audience, expiresIn,
                 });
             } catch (err) {
@@ -28,7 +28,7 @@ module.exports = () => {
                 });
 
                 return {
-                    sub: payload.sub, email: payload.email,
+                    sub: payload.sub, email: payload.email, role: payload.role,
                 };
             } catch (err) {
                 throw new InvalidAccessTokenError(err.message);

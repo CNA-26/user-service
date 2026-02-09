@@ -19,7 +19,7 @@ module.exports = (container) => {
         }
 
         try {
-            req.auth = accessTokenService.verify(token); // { sub, email }
+            req.auth = accessTokenService.verify(token); // { sub, email, role }
 
             next();
         } catch (err) {
