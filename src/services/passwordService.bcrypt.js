@@ -12,6 +12,19 @@ class BcryptPasswordService extends PasswordService {
     hash(password) {
         return bcrypt.hash(password, saltRounds);
     }
+    /**
+     * Compares password and hashedPassword, returns true if they match
+     * @param {string} password 
+     * @param {string} passwordHash
+     * @returns {boolean} 
+     */
+    async compare(password, passwordHash) {
+        try {
+            return await bcrypt.compare(password, passwordHash);
+        } catch (err) {
+            return false;
+        }
+    }
 }
 
 module.exports = {

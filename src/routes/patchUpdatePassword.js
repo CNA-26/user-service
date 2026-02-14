@@ -1,6 +1,5 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
@@ -74,12 +73,6 @@ module.exports = (container) => {
                 message: "User password updated successfully",
             });
         } catch (err) {
-            if (err.message === 'PASSWORD_COMPARISON_ERROR') {
-                return res.status(500).json({
-                    error: "Error comparing passwords",
-                    code: "INTERNAL_ERROR",
-                });
-            }
             if (err.message === 'INCORRECT_PASSWORD') {
                 return res.status(401).json({
                     error: "Incorrect password",
@@ -103,14 +96,10 @@ module.exports = (container) => {
                 },
             });
 
-            bcrypt.compare(password, user.passwordHash, (err, result) => {
-                if (err) {
-                    throw new Error('PASSWORD_COMPARISON_ERROR');
-                }
-                if (!result) {
-                    throw new Error('INCORRECT_PASSWORD');
-                }
-            });
+            const matches = await passwordService.compare(password, user.passwordHash);
+            if (!matches) {
+                throw new Error('INCORRECT_PASSWORD')
+            }
 
             const passwordHash = await passwordService.hash(newPassword);
 

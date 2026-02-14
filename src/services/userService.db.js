@@ -1,9 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
 
 const { UserService, UserNotFoundError, WrongPasswordError } = require('./userService');
+const { BcryptPasswordService } = require('./passwordService.bcrypt');
 
 const prisma = new PrismaClient();
+const passwordService = new BcryptPasswordService();
 
 class DbUserService extends UserService {
     /**
@@ -22,7 +23,7 @@ class DbUserService extends UserService {
         }
 
         // Check password
-        const valid = await bcrypt.compare(password, user.passwordHash);
+        const valid = await passwordService.compare(password, user.passwordHash);
         if (!valid) {
             throw new WrongPasswordError();
         }
