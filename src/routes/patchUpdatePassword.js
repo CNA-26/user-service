@@ -67,7 +67,37 @@ module.exports = (container) => {
         }
 
         try {
-            const user = await prisma.user.findUnique({
+            updatePassword(userId, password, newPassword);
+
+            return res.status(200).json({
+                id: userId,
+                message: "User password updated successfully",
+            });
+        } catch (err) {
+            if (err.message === 'PASSWORD_COMPARISON_ERROR') {
+                return res.status(500).json({
+                    error: "Error comparing passwords",
+                    code: "INTERNAL_ERROR",
+                });
+            }
+            if (err.message === 'INCORRECT_PASSWORD') {
+                return res.status(401).json({
+                    error: "Incorrect password",
+                    code: "WRONG_PASSWORD",
+                })
+            }
+
+            console.log(err);
+            return res.status(500).json({
+                error: "Internal server errror",
+                code: "INTERNAL_ERROR",
+            });
+        }
+    });
+
+    const updatePassword = (userId, password, newPassword) => {
+        return prisma.$transaction(async (tx) => {
+            const user = await tx.user.findUnique({
                 where: {
                     id: userId,
                 },
@@ -75,23 +105,16 @@ module.exports = (container) => {
 
             bcrypt.compare(password, user.passwordHash, (err, result) => {
                 if (err) {
-                    return res.status(500).json({
-                        error: "Error comparing passwords",
-                        code: "INTERNAL_ERROR",
-                    });
+                    throw new Error('PASSWORD_COMPARISON_ERROR');
                 }
-
                 if (!result) {
-                    return res.status(401).json({
-                        error: "Incorrect password",
-                        code: "WRONG_PASSWORD",
-                    });
+                    throw new Error('INCORRECT_PASSWORD');
                 }
             });
 
             const passwordHash = await passwordService.hash(newPassword);
 
-            const updateUser = await prisma.user.update({
+            await tx.user.update({
                 where: {
                     id: userId,
                 },
@@ -103,21 +126,10 @@ module.exports = (container) => {
             await prisma.refreshToken.delete({
                 where: {
                     userId: userId,
-                }
+                },
             });
-
-            return res.status(200).json({
-                id: updateUser.id,
-                message: "User password updated successfully",
-            });
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json({
-                error: "Internal server errror",
-                code: "INTERNAL_ERROR",
-            });
-        }
-    });
+        });
+    }
 
     return router;
 }
