@@ -25,6 +25,15 @@ const createContainer = () => {
         services.refreshTokenService = new DbRefreshTokenService();
     }
 
+    const psChoice = (process.env.USE_MOCK_HASHING || 'false').toLowerCase();
+    if (psChoice === 'true') {
+        const { MockPasswordService } = require('./services/passwordService.mock');
+        services.passwordService = new MockPasswordService();
+    } else {
+        const { BcryptPasswordService } = require('./services/passwordService.bcrypt');
+        services.passwordService = new BcryptPasswordService();
+    }
+
     return {
         get(name) {
             const svc = services[name];
@@ -34,4 +43,4 @@ const createContainer = () => {
     };
 };
 
-module.exports = {createContainer};
+module.exports = { createContainer };

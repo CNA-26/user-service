@@ -16,14 +16,14 @@ module.exports = (container) => {
     app.use('/api/auth/logout', require('./routes/postLogout')(container));
     app.use('/api/auth/login', require('./routes/postLogin')(container));
 
-    app.use('/api/auth/users', require('./routes/postUsers'));
+    app.use('/api/auth/users', require('./routes/postUsers')(container));
     app.use('/api/auth/users', authMiddleware, require('./routes/getUsers'));
 
     app.use('/api/auth/users', authMiddleware, require('./routes/putUsers'));
 
     app.use('/api/auth/users', authMiddleware, require('./routes/deleteUsers'));
     app.use('/api/auth/users', require('./routes/postResetPassword'));
-    app.use('/api/auth/users', require('./routes/patchUpdatePassword'));
+    app.use('/api/auth/users', require('./routes/patchUpdatePassword')(container));
 
     return app;
 };

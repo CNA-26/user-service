@@ -3,116 +3,121 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
-const router = express.Router();
 
-/**
- * @openapi
- * /api/auth/users/updatePassword:
- *   patch:
- *     summary: Update user password, invalidates refresh token
- *     tags: 
- *       - Users
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - password
- *               - newPassword
- *             properties:
- *               userId:
- *                 type: string
- *                 format: uuid
- *               password:
- *                 type: string
- *                 format: password
- *               newPassword:
- *                 type: string
- *                 format: password
- *     responses:
- *       200:
- *         description: User password updated
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   format: uuid
- *                 message:
- *                   type: string
- *                   example: User password updated successfully
- *       401:
- *         description: User unauthorized
- *       422:
- *         description: Invalid request body
- *       500:
- *         description: Internal server error
- */
-router.patch('/updatePassword', async (req, res) => {
-    const { userId, password, newPassword } = req.body || {};
+module.exports = (container) => {
+    const router = express.Router();
+    const passwordService = container.get('passwordService');
 
-    if (!userId || !password || !newPassword) {
-        return res.status(422).json({
-            error: "userId, password and newPassword are required",
-            code: "VALIDATION_ERROR",
-        });
-    }
+    /**
+     * @openapi
+     * /api/auth/users/updatePassword:
+     *   patch:
+     *     summary: Update user password, invalidates refresh token
+     *     tags: 
+     *       - Users
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - userId
+     *               - password
+     *               - newPassword
+     *             properties:
+     *               userId:
+     *                 type: string
+     *                 format: uuid
+     *               password:
+     *                 type: string
+     *                 format: password
+     *               newPassword:
+     *                 type: string
+     *                 format: password
+     *     responses:
+     *       200:
+     *         description: User password updated
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 id:
+     *                   type: string
+     *                   format: uuid
+     *                 message:
+     *                   type: string
+     *                   example: User password updated successfully
+     *       401:
+     *         description: User unauthorized
+     *       422:
+     *         description: Invalid request body
+     *       500:
+     *         description: Internal server error
+     */
+    router.patch('/updatePassword', async (req, res) => {
+        const { userId, password, newPassword } = req.body || {};
 
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId,
-            },
-        });
+        if (!userId || !password || !newPassword) {
+            return res.status(422).json({
+                error: "userId, password and newPassword are required",
+                code: "VALIDATION_ERROR",
+            });
+        }
 
-        bcrypt.compare(password, user.passwordHash, (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    error: "Error comparing passwords",
-                    code: "INTERNAL_ERROR",
-                });
-            }
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId,
+                },
+            });
 
-            if (!result) {
-                return res.status(401).json({
-                    error: "Incorrect password",
-                    code: "WRONG_PASSWORD",
-                });
-            }
-        });
+            bcrypt.compare(password, user.passwordHash, (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        error: "Error comparing passwords",
+                        code: "INTERNAL_ERROR",
+                    });
+                }
 
-        const passwordHash = bcrypt.hash(newPassword, 10);
+                if (!result) {
+                    return res.status(401).json({
+                        error: "Incorrect password",
+                        code: "WRONG_PASSWORD",
+                    });
+                }
+            });
 
-        const updateUser = await prisma.user.update({
-            where: {
-                id: userId,
-            },
-            data: {
-                passwordHash: passwordHash,
-            },
-        });
+            const passwordHash = await passwordService.hash(newPassword);
 
-        await prisma.refreshToken.delete({
-            where: {
-                userId: userId,
-            }
-        });
+            const updateUser = await prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    passwordHash: passwordHash,
+                },
+            });
 
-        return res.status(200).json({
-            id: updateUser.id,
-            message: "User password updated successfully",
-        });
-    } catch (err) {
-        return res.status(500).json({
-            error: "Internal server errror",
-            code: "INTERNAL_ERROR",
-        });
-    }
-});
+            await prisma.refreshToken.delete({
+                where: {
+                    userId: userId,
+                }
+            });
 
-module.exports = router;
+            return res.status(200).json({
+                id: updateUser.id,
+                message: "User password updated successfully",
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({
+                error: "Internal server errror",
+                code: "INTERNAL_ERROR",
+            });
+        }
+    });
+
+    return router;
+}
