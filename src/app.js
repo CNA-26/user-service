@@ -16,15 +16,16 @@ module.exports = (container) => {
     app.use('/api/auth/logout', require('./routes/postLogout')(container));
     app.use('/api/auth/login', require('./routes/postLogin')(container));
 
-    app.use('/api/auth/users', require('./routes/postUsers')(container));
-    app.use('/api/auth/users', authMiddleware, require('./routes/getUsers'));
-
-    app.use('/api/auth/users', authMiddleware, require('./routes/putUsers'));
-
-    app.use('/api/auth/users', authMiddleware, require('./routes/deleteUsers'));
-    app.use('/api/auth/users', require('./routes/postResetPassword'));
-    app.use('/api/auth/users', require('./routes/patchUpdatePassword')(container));
+    // Non auth endpoints, to the same path, need to be defined first before auth endpoints,
+    // otherwise auth logic is applied to non auth endpoints!
     app.use('/api/auth/users', require('./routes/postRequestPasswordReset'));
+    app.use('/api/auth/users', require('./routes/patchUpdatePassword')(container));
+    app.use('/api/auth/users', require('./routes/postUsers')(container));
+    app.use('/api/auth/users', require('./routes/postResetPassword'));
+
+    app.use('/api/auth/users', authMiddleware, require('./routes/getUsers'));
+    app.use('/api/auth/users', authMiddleware, require('./routes/putUsers'));
+    app.use('/api/auth/users', authMiddleware, require('./routes/deleteUsers'));
 
     return app;
 };
