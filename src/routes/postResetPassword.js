@@ -91,6 +91,13 @@ module.exports = (container) => {
                 message: 'Password reset successfully',
             });
         } catch (err) {
+            if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+                return res.status(401).json({
+                    error: 'Invalid or expired token',
+                    code: 'INVALID_TOKEN',
+                });
+            }
+
             return res.status(500).json({
                 error: 'Internal server error',
                 code: 'INTERNAL_ERROR',
