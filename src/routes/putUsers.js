@@ -23,6 +23,8 @@ const router = express.Router();
  *             required:
  *               - userId
  *               - email
+ *               - role
+ *               - mailingAddress
  *             properties:
  *               userId:
  *                 type: string
@@ -34,6 +36,9 @@ const router = express.Router();
  *                 type: string
  *                 enum: [USER, ADMIN]
  *                 description: Can only be changed by ADMIN
+ *               mailingAddress:
+ *                 type: string
+ *                 description: User mailing address (cannot be null, use empty string instead)
  *     responses:
  *       200:
  *         description: User data updated
@@ -50,7 +55,7 @@ const router = express.Router();
  */
 
 router.put('/', async (req, res) => {
-    const {userId, email, role} = req.body || {};
+    const {userId, email, role, mailingAddress} = req.body || {};
     const auth = req.auth;
 
     if (auth.sub !== userId && auth.role !== Roles.ADMIN) {
@@ -60,11 +65,12 @@ router.put('/', async (req, res) => {
     }
 
     // Validation
-    if (!userId || !email || !role) {
+    if (!userId || !email || !role || mailingAddress === undefined || mailingAddress === null) {
         return res.status(422).json({
-            error: 'userId, email and role are required', code: 'VALIDATION_ERROR',
+            error: 'userId, email, role and mailingAddress are required', code: 'VALIDATION_ERROR',
         });
     }
+
     if (!Object.values(Roles).includes(role)) {
         return res.status(422).json({
             error: 'Invalid role value', code: 'VALIDATION_ERROR',
@@ -94,15 +100,18 @@ router.put('/', async (req, res) => {
                 throw new Error('USER_NOT_FOUND');
             }
 
-            const updateData = {email};
+            const updateData = {
+                email, mailingAddress
+            };
 
             // Handle role update if provided
-            if (role && role !== existingUser.role) {
+            if (role !== existingUser.role) {
 
                 // Only ADMIN can change roles
                 if (auth.role !== Roles.ADMIN) {
                     throw new Error('FORBIDDEN');
                 }
+
                 updateData.role = role;
             }
 
@@ -113,7 +122,11 @@ router.put('/', async (req, res) => {
         });
 
         return res.json({
-            id: result.id, email: result.email, role: result.role, createdAt: result.createdAt,
+            id: result.id,
+            email: result.email,
+            role: result.role,
+            mailingAddress: result.mailingAddress,
+            createdAt: result.createdAt,
         });
 
     } catch (err) {
@@ -136,6 +149,7 @@ router.put('/', async (req, res) => {
         }
 
         console.error('PUT /users error:', err);
+
         return res.status(500).json({
             error: 'Internal server error', code: 'INTERNAL_ERROR',
         });
