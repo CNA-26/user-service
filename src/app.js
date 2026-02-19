@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
@@ -6,6 +7,7 @@ const swaggerSpec = require('./swagger');
 module.exports = (container) => {
     const app = express();
     app.use(bodyParser.json());
+    app.use(cors());
 
     const authMiddleware = require('./middlewares/authMiddleware')(container);
 
