@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
@@ -6,6 +7,7 @@ const swaggerSpec = require('./swagger');
 module.exports = (container) => {
     const app = express();
     app.use(bodyParser.json());
+    app.use(cors());
 
     const authMiddleware = require('./middlewares/authMiddleware')(container);
 
@@ -16,14 +18,16 @@ module.exports = (container) => {
     app.use('/api/auth/logout', require('./routes/postLogout')(container));
     app.use('/api/auth/login', require('./routes/postLogin')(container));
 
-    app.use('/api/auth/users', require('./routes/postUsers'));
+    // Non auth endpoints, to the same path, need to be defined first before auth endpoints,
+    // otherwise auth logic is applied to non auth endpoints!
+    app.use('/api/auth/users', require('./routes/postRequestPasswordReset'));
+    app.use('/api/auth/users', require('./routes/patchUpdatePassword')(container));
+    app.use('/api/auth/users', require('./routes/postUsers')(container));
+    app.use('/api/auth/users', require('./routes/postResetPassword')(container));
+
     app.use('/api/auth/users', authMiddleware, require('./routes/getUsers'));
-
     app.use('/api/auth/users', authMiddleware, require('./routes/putUsers'));
-
     app.use('/api/auth/users', authMiddleware, require('./routes/deleteUsers'));
-    app.use('/api/auth/users', require('./routes/postResetPassword'));
-    app.use('/api/auth/users', require('./routes/patchUpdatePassword'));
 
     return app;
 };
