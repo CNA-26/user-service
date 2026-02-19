@@ -30,11 +30,17 @@ const router = express.Router();
  *               email:
  *                 type: string
  *                 format: email
+ *               role:
+ *                 type: string
+ *                 enum: [USER, ADMIN]
+ *                 description: Can only be changed by ADMIN
  *     responses:
  *       200:
  *         description: User data updated
  *       401:
  *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       400:
  *         description: User not found
  *       422:
@@ -44,7 +50,7 @@ const router = express.Router();
  */
 
 router.put('/', async (req, res) => {
-    const {userId, email} = req.body || {};
+    const {userId, email, role} = req.body || {};
     const auth = req.auth;
 
     if (auth.sub !== userId && auth.role !== Roles.ADMIN) {
@@ -53,10 +59,15 @@ router.put('/', async (req, res) => {
         });
     }
 
-    // validation
-    if (!userId || !email) {
+    // Validation
+    if (!userId || !email || !role) {
         return res.status(422).json({
-            error: 'userId and email are required', code: 'VALIDATION_ERROR',
+            error: 'userId, email and role are required', code: 'VALIDATION_ERROR',
+        });
+    }
+    if (!Object.values(Roles).includes(role)) {
+        return res.status(422).json({
+            error: 'Invalid role value', code: 'VALIDATION_ERROR',
         });
     }
 
@@ -68,17 +79,53 @@ router.put('/', async (req, res) => {
     }
 
     try {
-        const user = await prisma.user.update({
-            where: {id: userId}, data: {email},
+        const result = await prisma.$transaction(async (tx) => {
+
+            // Lock the target user row to prevent concurrent modifications
+            const lockedUsers = await tx.$queryRaw`
+                SELECT * FROM "User"
+                WHERE id = ${userId}
+                FOR UPDATE
+            `;
+
+            const existingUser = lockedUsers[0];
+
+            if (!existingUser) {
+                throw new Error('USER_NOT_FOUND');
+            }
+
+            const updateData = {email};
+
+            // Handle role update if provided
+            if (role && role !== existingUser.role) {
+
+                // Only ADMIN can change roles
+                if (auth.role !== Roles.ADMIN) {
+                    throw new Error('FORBIDDEN');
+                }
+                updateData.role = role;
+            }
+
+            // Perform update within the same transaction
+            return await tx.user.update({
+                where: {id: userId}, data: updateData,
+            });
         });
 
         return res.json({
-            id: user.id, email: user.email, createdAt: user.createdAt,
+            id: result.id, email: result.email, role: result.role, createdAt: result.createdAt,
         });
+
     } catch (err) {
-        if (err.code === 'P2025') {
+        if (err.message === 'USER_NOT_FOUND') {
             return res.status(400).json({
                 error: 'User not found', code: 'USER_NOT_FOUND',
+            });
+        }
+
+        if (err.message === 'FORBIDDEN') {
+            return res.status(403).json({
+                error: 'Forbidden: insufficient permissions', code: 'FORBIDDEN',
             });
         }
 
