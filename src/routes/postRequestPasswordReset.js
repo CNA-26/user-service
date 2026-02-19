@@ -74,7 +74,7 @@ router.post('/requestPasswordReset', async (req, res) => {
             algorithm: 'HS256', issuer, audience, expiresIn,
         });
 
-        const frontend_url = `https://frontend.com/passwordReset?token=${password_token}`;
+        const frontend_url = `https://users-frontend-git-usersfrontend.2.rahtiapp.fi/reset-password?token=${password_token}`;
 
         /*
         const email_response = await fetch(email_url, {
