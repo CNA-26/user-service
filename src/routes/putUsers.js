@@ -84,7 +84,7 @@ router.put('/', async (req, res) => {
             // Lock the target user row to prevent concurrent modifications
             const lockedUsers = await tx.$queryRaw`
                 SELECT * FROM "User"
-                WHERE id = ${userId}
+                WHERE id = ${userId}::uuid
                 FOR UPDATE
             `;
 
