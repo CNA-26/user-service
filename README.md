@@ -6,9 +6,9 @@ Vår JSON Web Token använder HS256 kryptering och består av fåljande påståe
 
 *  "sub": användar-ID, i UUID format
 *  "email":
-*  "name": användarnamn
+*  "name": personnamn
 *  "role": användarroll liksom "USER" (standard) eller "ADMIN"
-*  "mailingAddress":
+*  "address": postadress
 *  "iat": utfärdad i, i TimeStamp format
 *  "exp": utlöpas i, i TimeStamp format
 

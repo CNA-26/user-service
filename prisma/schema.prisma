@@ -8,13 +8,13 @@ datasource db {
 }
 
 model User {
-  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email             String          @unique
-  name              String          @default("")
-  role              Role            @default(USER)
-  mailingAddress    String          @default("")
-  passwordHash      String
-  createdAt         DateTime        @default(dbgenerated("now()"))
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique
+  name         String   @default("")
+  role         Role     @default(USER)
+  addresses    String   @default("")
+  passwordHash String
+  createdAt    DateTime @default(dbgenerated("now()"))
 
   refreshTokens RefreshToken[]
 }
@@ -25,11 +25,11 @@ enum Role {
 }
 
 model RefreshToken {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  token      String   @unique
-  issuedAt   DateTime @default(dbgenerated("now()"))
-  expiresAt  DateTime
-  userId     String   @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token     String   @unique
+  issuedAt  DateTime @default(dbgenerated("now()"))
+  expiresAt DateTime
+  userId    String   @db.Uuid
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
