@@ -2,11 +2,13 @@
 
 User interface for OpenAPI documentation: [production](https://user-service-cna-26-user-service.2.rahtiapp.fi/api/auth/docs/), [unstable](https://user-service-devel-cna-26-user-service.2.rahtiapp.fi/api/auth/docs/).
 
-Vår JSON Web Tokens använder HS256 kryptering och består av fåljande påståenden, med mera:  
+Vår JSON Web Token använder HS256 kryptering och består av fåljande påståenden, med mera:
 
 *  "sub": användar-ID, i UUID format
 *  "email":
-*  "role": användarroll liksom"USER" eller "ADMIN"
+*  "name": användarnamn
+*  "role": användarroll liksom "USER" (standard) eller "ADMIN"
+*  "mailingAddress":
 *  "iat": utfärdad i, i TimeStamp format
 *  "exp": utlöpas i, i TimeStamp format
 
