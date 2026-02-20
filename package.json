@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CNA-26/user-servic.git"
+    "url": "git+https://github.com/CNA-26/user-service.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/CNA-26/user-servic/issues"
+    "url": "https://github.com/CNA-26/user-service/issues"
   },
-  "homepage": "https://github.com/CNA-26/user-servic#readme",
+  "homepage": "https://github.com/CNA-26/user-service#readme",
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.19.2",

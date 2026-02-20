@@ -23,8 +23,9 @@ const router = express.Router();
  *             required:
  *               - userId
  *               - email
+ *               - name
  *               - role
- *               - mailingAddress
+ *               - address
  *             properties:
  *               userId:
  *                 type: string
@@ -32,11 +33,14 @@ const router = express.Router();
  *               email:
  *                 type: string
  *                 format: email
+ *               name:
+ *                 type: string
+ *                 description: User's full name (cannot be null, use empty string instead)
  *               role:
  *                 type: string
  *                 enum: [USER, ADMIN]
  *                 description: Can only be changed by ADMIN
- *               mailingAddress:
+ *               address:
  *                 type: string
  *                 description: User mailing address (cannot be null, use empty string instead)
  *     responses:
@@ -55,7 +59,7 @@ const router = express.Router();
  */
 
 router.put('/', async (req, res) => {
-    const {userId, email, role, mailingAddress} = req.body || {};
+    const {userId, email, name, role, address} = req.body || {};
     const auth = req.auth;
 
     if (auth.sub !== userId && auth.role !== Roles.ADMIN) {
@@ -65,9 +69,9 @@ router.put('/', async (req, res) => {
     }
 
     // Validation
-    if (!userId || !email || !role || mailingAddress === undefined || mailingAddress === null) {
+    if (!userId || !email || name === undefined || name === null || !role || address === undefined || address === null) {
         return res.status(422).json({
-            error: 'userId, email, role and mailingAddress are required', code: 'VALIDATION_ERROR',
+            error: 'userId, email, name, role and address are required', code: 'VALIDATION_ERROR',
         });
     }
 
@@ -101,7 +105,7 @@ router.put('/', async (req, res) => {
             }
 
             const updateData = {
-                email, mailingAddress
+                email, name, address
             };
 
             // Handle role update if provided
@@ -124,8 +128,9 @@ router.put('/', async (req, res) => {
         return res.json({
             id: result.id,
             email: result.email,
+            name: result.name,
             role: result.role,
-            mailingAddress: result.mailingAddress,
+            address: result.address,
             createdAt: result.createdAt,
         });
 
