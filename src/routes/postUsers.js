@@ -6,6 +6,8 @@ const prisma = new PrismaClient();
 module.exports = (container) => {
     const router = express.Router();
     const passwordService = container.get('passwordService');
+    const secret = process.env.JWT_SECRET || 'super-secret-key';
+    const emailServiceUrl = process.env.EMAIL_SERVICE_URL || 'http://localhost:3001';
 
     /**
      * @openapi
@@ -23,6 +25,7 @@ module.exports = (container) => {
      *             required:
      *               - email
      *               - password
+     *               - name
      *             properties:
      *               email:
      *                 type: string
@@ -30,6 +33,9 @@ module.exports = (container) => {
      *               password:
      *                 type: string
      *                 format: password
+     *               name:
+     *                 type: string
+     *                 description: User's full name
      *     responses:
      *       201:
      *         description: User successfully created
@@ -44,6 +50,8 @@ module.exports = (container) => {
      *                 email:
      *                   type: string
      *                   format: email
+     *                 name:
+     *                   type: string
      *                 createdAt:
      *                   type: string
      *                   format: date-time
@@ -74,11 +82,11 @@ module.exports = (container) => {
      */
 
     router.post('/', async (req, res) => {
-        const { email, password } = req.body || {};
+        const { email, password, name } = req.body || {};
 
-        if (!email || !password) {
+        if (!email || !password || !name) {
             return res.status(422).json({
-                error: 'Email and password are required', code: 'VALIDATION_ERROR',
+                error: 'Email, password and name are required', code: 'VALIDATION_ERROR',
             });
         }
 
@@ -95,12 +103,38 @@ module.exports = (container) => {
 
             const user = await prisma.user.create({
                 data: {
-                    email, passwordHash,
+                    email, passwordHash, name
                 },
             });
 
+            // Send registration email via Email Service
+            try {
+
+                const response = await fetch(`${emailServiceUrl}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': secret,
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        name: name,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('Email service returned error:', response.status, errorData);
+                } else {
+                    console.log('Registration email sent successfully to:', email);
+                }
+            } catch (emailError) {
+                console.error('Failed to send registration email:', emailError);
+                // Don't fail the request if email service is down - user is already created
+            }
+
             return res.status(201).json({
-                id: user.id, email: user.email, createdAt: user.createdAt,
+                id: user.id, email: user.email, name: user.name, createdAt: user.createdAt,
             });
         } catch (err) {
             if (err.code === 'P2002' && err.meta?.target?.includes('email')) {
