@@ -79,7 +79,7 @@ router.post('/requestPasswordReset', async (req, res) => {
 
         const frontend_url = frontendResetUrl + password_token;
 
-        const _ = await fetch(emailurl, {
+        const _ = await fetch(emailurl + "reset-password", {
             method: 'POST',
             headers: {
                 'X-API-Key': emailApiKey,
