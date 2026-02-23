@@ -37,7 +37,13 @@ const router = express.Router();
  *                 email:
  *                   type: string
  *                   format: email
- *                 userName:
+ *                 name:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 address:
+ *                   type: string
+ *                 createdAt:
  *                   type: string
  * /api/auth/users:
  *   get:
@@ -63,8 +69,15 @@ const router = express.Router();
  *                      email:
  *                        type: string
  *                        format: email
- *                      userName:
+ *                      name:
  *                        type: string
+ *                      role:
+ *                        type: string
+ *                      address:
+ *                        type: string
+ *                      createdAt:
+ *                        type: string
+ *
  */
 router.get('/', async (req, res) => {
     const auth = req.auth;
@@ -82,6 +95,8 @@ router.get('/', async (req, res) => {
                 id: true,
                 email: true,
                 createdAt: true,
+                address: true,
+                role: true,
             },
         });
 
@@ -122,6 +137,8 @@ router.get('/:email', async (req, res) => {
                 id: true,
                 email: true,
                 createdAt: true,
+                address: true,
+                role: true,
             },
         });
 
