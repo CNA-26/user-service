@@ -86,7 +86,7 @@ router.post('/requestPasswordReset', async (req, res) => {
             },
             body: JSON.stringify({
                 email: user.email,
-                name: 'UserName',
+                name: user.name,
                 link: frontend_url,
             }),
         });
