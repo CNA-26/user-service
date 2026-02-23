@@ -93,6 +93,7 @@ router.get('/', async (req, res) => {
         const users = await prisma.user.findMany({
             select: {
                 id: true,
+                name: true,
                 email: true,
                 createdAt: true,
                 address: true,
@@ -135,6 +136,7 @@ router.get('/:email', async (req, res) => {
             },
             select: {
                 id: true,
+                name: true,
                 email: true,
                 createdAt: true,
                 address: true,
