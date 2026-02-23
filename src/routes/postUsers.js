@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 module.exports = (container) => {
     const router = express.Router();
     const passwordService = container.get('passwordService');
-    const secret = process.env.JWT_SECRET || 'super-secret-key';
+    const emailApiKey = process.env.EMAIL_API_KEY || 'super-secret-key';
     const emailServiceUrl = process.env.EMAIL_SERVICE_URL || 'http://localhost:3001';
 
     /**
@@ -114,7 +114,7 @@ module.exports = (container) => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': secret,
+                        'X-API-Key': emailApiKey,
                     },
                     body: JSON.stringify({
                         email: email,

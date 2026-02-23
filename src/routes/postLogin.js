@@ -35,10 +35,10 @@ module.exports = (container) => {
      *             schema:
      *               type: object
      *               properties:
-     *                 token:
+     *                 accessToken:
      *                   type: string
-     *                 user:
-     *                   type: object
+     *                 refreshToken:
+     *                   type: string
      */
     router.post('/', async (req, res) => {
         const {email, password} = req.body || {};

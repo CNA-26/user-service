@@ -11,6 +11,9 @@ const issuer = process.env.JWT_ISSUER || 'user-auth';
 const audience = process.env.JWT_AUDIENCE || 'user-frontend';
 const expiresIn = '15m';
 const successMessage = "A password reset request has been sent";
+const emailurl = "https://email-service-cna-2026.2.rahtiapp.fi/";
+const frontendResetUrl = "https://users-frontend-git-usersfrontend.1.rahtiapp.fi/reset-password?token=";
+const emailApiKey = process.env.EMAIL_API_KEY;
 
 /**
  * @openapi
@@ -74,18 +77,19 @@ router.post('/requestPasswordReset', async (req, res) => {
             algorithm: 'HS256', issuer, audience, expiresIn,
         });
 
-        const frontend_url = `https://users-frontend-git-usersfrontend.2.rahtiapp.fi/reset-password?token=${password_token}`;
+        const frontend_url = frontendResetUrl + password_token;
 
-        /*
-        const email_response = await fetch(email_url, {
+        const _ = await fetch(emailurl + "reset-password", {
             method: 'POST',
+            headers: {
+                'X-API-Key': emailApiKey,
+            },
             body: JSON.stringify({
                 email: user.email,
-                name: 'UserName',
+                name: user.name,
                 link: frontend_url,
-            });
+            }),
         });
-        */
         return res.status(200).json({
             message: successMessage,
         });
