@@ -12,7 +12,7 @@ class DbRefreshTokenService extends RefreshTokenService {
     /**
      * Generate a new refresh token and store it in the DB.
      * @param {string} userId
-     * @returns {Promise<{ token: string, userId: string, email: string}>}
+     * @returns {Promise<{ token: string, userId: string, email: string }>}
      */
     async generate(userId) {
         try {
@@ -38,7 +38,7 @@ class DbRefreshTokenService extends RefreshTokenService {
     /**
      * Exchange an old refresh token for a new one, atomically.
      * @param {string} oldToken
-     * @returns {Promise<{ token: string, expiresAt: Date }>}
+     * @returns {Promise<{ token: string, userId: string, expiresAt: Date }>}
      */
     async refresh(oldToken) {
         try {
@@ -67,7 +67,7 @@ class DbRefreshTokenService extends RefreshTokenService {
                     },
                 });
 
-                return { token: newToken, expiresAt };
+                return { token: newToken, userId: existing.userId, expiresAt };
             });
         } catch (err) {
             if (err instanceof InvalidRefreshTokenError) throw err;
@@ -80,7 +80,7 @@ class DbRefreshTokenService extends RefreshTokenService {
     async delete(token) {
         try {
             await prisma.refreshToken.delete({
-                where: {token},
+                where: { token },
             });
         } catch (err) {
             if (err.code === 'P2025') {
