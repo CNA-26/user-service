@@ -10,7 +10,7 @@ Vår JSON Web Token använder HS256 kryptering och består av fåljande påståe
 *  "iat": utfärdad i, i TimeStamp format
 *  "exp": utlöpas i, i TimeStamp format
 *  "aud": [publikum](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3)
-*  "aud": [utgivare](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1)
+*  "iss": [utgivare](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1)
 
 ## Instructions for Developers
 
