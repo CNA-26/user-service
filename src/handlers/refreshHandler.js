@@ -2,6 +2,8 @@ module.exports = (container) => {
     const accessTokenService = container.get('accessTokenService');
     const refreshTokenService = container.get('refreshTokenService');
     const { Roles } = require('../constants/roles');
+    const { PrismaClient } = require('@prisma/client');
+    const prisma = new PrismaClient();
 
     return {
         /**
@@ -11,7 +13,7 @@ module.exports = (container) => {
          */
         async refresh(refreshToken) {
             // Exchange old refresh token for a new one
-            const { token: newRefreshToken, userId, email } = await refreshTokenService.refresh(refreshToken);
+            const { token: newRefreshToken, userId } = await refreshTokenService.refresh(refreshToken);
 
             const user = await prisma.user.findUnique({
                 where: {
@@ -19,11 +21,12 @@ module.exports = (container) => {
                 },
                 select: {
                     role: true,
+                    email: true,
                 },
             });
             const role = user.role || Roles.USER;
 
-            const newAccessToken = accessTokenService.sign(userId, email, role);
+            const newAccessToken = accessTokenService.sign(userId, user.email, role);
 
             return {
                 accessToken: newAccessToken, refreshToken: newRefreshToken,
