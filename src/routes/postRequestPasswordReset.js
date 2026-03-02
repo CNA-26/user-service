@@ -12,7 +12,7 @@ const audience = process.env.JWT_AUDIENCE || 'user-frontend';
 const expiresIn = '15m';
 const successMessage = "A password reset request has been sent";
 const emailurl = "https://email-service-cna-2026.2.rahtiapp.fi/";
-const frontendResetUrl = "https://users-frontend-git-usersfrontend.1.rahtiapp.fi/reset-password?token=";
+const frontendResetUrl = "https://users-frontend-users-frontend.2.rahtiapp.fi/reset-password?token=";
 const emailApiKey = process.env.EMAIL_API_KEY;
 
 /**
