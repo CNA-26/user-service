@@ -37,10 +37,10 @@ const router = express.Router();
  *                   format: uuid
  *       400:
  *         description: userId is required
- *       401:
- *         description: User unauthorized
  *       403:
  *         description: No permission to access resource
+ *       404:
+ *         description: User not found
  */
 router.delete('/:userId', async (req, res) => {
     const { userId } = req.params || {};
@@ -74,9 +74,9 @@ router.delete('/:userId', async (req, res) => {
     } catch (error) {
         console.log(`DELETE /users/${userId} error:`, error);
         // OBS: db felmeddelandena kan innehåll hemligheter!!! -> skapa ett eget felmeddelande
-        return res.status(401).json({
-            msg: 'User unauthorized',
-            code: 'UNAUTHORIZED'
+        return res.status(404).json({
+            msg: 'User not found',
+            code: 'USER_NOT_FOUND'
         });
     }
 });
