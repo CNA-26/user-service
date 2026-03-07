@@ -91,7 +91,7 @@ router.post('/requestPasswordReset', async (req, res) => {
             }),
         });
 
-        console.log(`[postRequestPasswordReset] [status] emailResponse: ${emailResponse}`)
+        console.log(`[postRequestPasswordReset] [response] emailResponse: ${JSON.stringify(emailResponse)}`)
 
         return res.status(200).json({
             message: successMessage,
