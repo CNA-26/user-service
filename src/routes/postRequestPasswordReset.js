@@ -79,7 +79,7 @@ router.post('/requestPasswordReset', async (req, res) => {
 
         const frontend_url = frontendResetUrl + password_token;
 
-        const _ = await fetch(emailurl + "reset-password", {
+        const emailResponse = await fetch(emailurl + "reset-password", {
             method: 'POST',
             headers: {
                 'X-API-Key': emailApiKey,
@@ -90,6 +90,9 @@ router.post('/requestPasswordReset', async (req, res) => {
                 link: frontend_url,
             }),
         });
+
+        console.log(`[postRequestPasswordReset] [status] emailResponse: ${emailResponse}`)
+
         return res.status(200).json({
             message: successMessage,
         });
