@@ -91,12 +91,13 @@ router.post('/requestPasswordReset', async (req, res) => {
             }),
         })).json();
 
-        console.log(`[postRequestPasswordReset] [response] emailResponse: ${JSON.stringify(emailResponse)}`)
+        console.log(`[postRequestPasswordReset] [response] emailResponse: ${JSON.stringify(emailResponse)}`);
 
         return res.status(200).json({
             message: successMessage,
         });
     } catch (err) {
+        console.error(err);
         return res.status(500).json({
             error: "Internal server error",
             code: "INTERNAL_ERROR",
