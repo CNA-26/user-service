@@ -79,9 +79,10 @@ router.post('/requestPasswordReset', async (req, res) => {
 
         const frontend_url = frontendResetUrl + password_token;
 
-        const _ = await fetch(emailurl + "reset-password", {
+        await fetch(emailurl + "reset-password", {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'X-API-Key': emailApiKey,
             },
             body: JSON.stringify({
@@ -89,11 +90,21 @@ router.post('/requestPasswordReset', async (req, res) => {
                 name: user.name,
                 link: frontend_url,
             }),
+        }).then(res => {
+            const body = res.json();
+
+            if (!res.ok) {
+                console.log(`[postRequestPasswordReset] [response] email api request failed with status: ${res.status}, body: ${body}`);
+            } else {
+                console.log(`[postRequestPasswordReset] [response] email api request successfull with body: ${body}`);
+            }
         });
+
         return res.status(200).json({
             message: successMessage,
         });
     } catch (err) {
+        console.error(err);
         return res.status(500).json({
             error: "Internal server error",
             code: "INTERNAL_ERROR",
