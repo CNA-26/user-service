@@ -91,12 +91,14 @@ router.post('/requestPasswordReset', async (req, res) => {
                 link: frontend_url,
             }),
         }).then(res => {
+            const body = res.json();
+
             if (!res.ok) {
-                console.log(`[postRequestPasswordReset] [response] request failed with status: ${res.status}, body: ${res.json()}`);
+                console.log(`[postRequestPasswordReset] [response] email api request failed with status: ${res.status}, body: ${body}`);
             } else {
-                console.log(`[postRequestPasswordReset] [response] emailResponse: ${res.json()}`);
+                console.log(`[postRequestPasswordReset] [response] email api request successfull with body: ${body}`);
             }
-        })
+        });
 
         return res.status(200).json({
             message: successMessage,

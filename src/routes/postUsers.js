@@ -7,7 +7,7 @@ module.exports = (container) => {
     const router = express.Router();
     const passwordService = container.get('passwordService');
     const emailApiKey = process.env.EMAIL_API_KEY || 'super-secret-key';
-    const emailServiceUrl = process.env.EMAIL_SERVICE_URL || 'http://localhost:3001';
+    const emailServiceUrl = process.env.EMAIL_SERVICE_URL || 'https://email-service-cna-2026.2.rahtiapp.fi';
 
     /**
      * @openapi
