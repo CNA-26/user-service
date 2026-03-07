@@ -79,9 +79,10 @@ router.post('/requestPasswordReset', async (req, res) => {
 
         const frontend_url = frontendResetUrl + password_token;
 
-        const emailResponse = await (await fetch(emailurl + "reset-password", {
+        await fetch(emailurl + "reset-password", {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'X-API-Key': emailApiKey,
             },
             body: JSON.stringify({
@@ -89,9 +90,13 @@ router.post('/requestPasswordReset', async (req, res) => {
                 name: user.name,
                 link: frontend_url,
             }),
-        })).json();
-
-        console.log(`[postRequestPasswordReset] [response] emailResponse: ${JSON.stringify(emailResponse)}`);
+        }).then(res => {
+            if (!res.ok) {
+                console.log(`[postRequestPasswordReset] [response] request failed with status: ${res.status}, body: ${res.json()}`);
+            } else {
+                console.log(`[postRequestPasswordReset] [response] emailResponse: ${res.json()}`);
+            }
+        })
 
         return res.status(200).json({
             message: successMessage,
